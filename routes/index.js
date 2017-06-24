@@ -26,6 +26,23 @@ router.post('/newBoard', function(req, res, next) {
     }
     board[randRow][randCol] = 'M';
   }
+
+  //update tiles
+  for(var i = 0; i < req.body.rows; i++) {
+    for(var j = 0; j < req.body.cols; j++) {
+      if(board[i][j] !== 'M') {
+        var count = 0;
+        for(var xOffset = -1; xOffset <= 1; xOffset++) {
+          for(var yOffset = -1; yOffset <= 1; yOffset++) {
+            if(i + xOffset >= 0 && i + xOffset < req.body.rows && j + yOffset >= 0 && j + yOffset < req.body.cols) {
+              if(board[i + xOffset][j + yOffset] === 'M') count++;
+            }
+          }
+        }
+        board[i][j] = count;
+      }
+    }
+  }
   res.status(200).send({board: board});
 });
 
