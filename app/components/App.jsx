@@ -15,6 +15,7 @@ class App extends React.Component {
     this.newGameSubmit = this.newGameSubmit.bind(this);
   }
 
+  /* Validate form info, and if valid, pass to board component */
   newGameSubmit(e) {
     e.preventDefault();
     var numRows = parseInt(document.getElementById('rows').value);

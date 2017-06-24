@@ -18,69 +18,91 @@ class Board extends React.Component {
     this.dblClickCell = this.dblClickCell.bind(this);
   }
 
+  /* Listener for flag placement (CTRL + click) */
   dblClickCell(e) {
     e.preventDefault();
 
-    e.target.innerHTML = '[F]';
+    //If flag is there, remove it and update cleared count
+    if(e.target.innerHTML === '[F]') {
+      e.target.innerHTML = '[ ]';
+      this.setState({
+        cellsCleared: this.state.cellsCleared - 1
+      });
+    } else {
+      //if its not there, put it there and update cleared count
+      this.setState({
+        cellsCleared: this.state.cellsCleared + 1
+      });
+      e.target.innerHTML = '[F]';
+      //Did we win?
+      if(this.state.cellsCleared + this.state.mines === this.state.rows * this.state.cols) {
+        alert('You Win!!! :-)');
+      }
+    }
   }
 
+  /* Handler for clicking on tiles. */
   clickCell(e) {
     e.preventDefault();
 
+    //Is the game over already?
     if(this.state.gameOver) {
       alert("Sorry, but you got exploded. Please make a new game.");
       return;
     }
 
-    if(e.target.innerHTML !== '[ ]') {
+    //Did we already click on the tile?
+    if(e.target.innerHTML !== '[ ]' || e.target.innerHTML === '[F]') {
       return;
     }
 
+    //Is it a flag placement, not a regular click?
     if(e.ctrlKey) {
       this.dblClickCell(e);
       return;
     }
 
+    //The id property of the cell contains its matching board index
     var id = e.target.id.split(',');
     var row = parseInt(id[0]);
     var col = parseInt(id[1]);
    
-    //document.getElementById(e.target.id).innerHTML = '[' + this.state.board[row][col] + ']';
+    //Did we click a mine?
     if(this.state.board[row][col] === 'M') {
       this.setState({
         gameOver: true
       });
       e.target.innerHTML = '[' + this.state.board[row][col] + ']';
     } else if (this.state.board[row][col] === 0) {
-      //remove all adjacent zeros
+      //remove all adjacent if we clicked on a 0 tile.
       var removed = {};
       var count = 0;
       var removeZeros = function(row, col) {
-        if(removed[row + ',' + col] || !(row >= 0 && row < this.state.rows && col >= 0 && col < this.state.cols) || this.state.board[row][col] !== 0) {
+        //We should open the tile if we havent already, it is a valid index, and not a mine.
+        if(removed[row + ',' + col] || !(row >= 0 && row < this.state.rows && col >= 0 && col < this.state.cols) || this.state.board[row][col] === 'M') {
           return;
         }
-        document.getElementById(row + ',' + col).innerHTML = '[0]';
+        document.getElementById(row + ',' + col).innerHTML = '[' + this.state.board[row][col] + ']';
         removed[row + ',' + col] = true;
         count += 1;
-        //left
+        //left adjacent
         removeZeros(row - 1, col);
-        //right
+        //right adjacent
         removeZeros(row + 1, col);
-        //up
+        //up adjacent
         removeZeros(row, col - 1);
-        //down
+        //down adjacent
         removeZeros(row, col + 1);
       }
+      //bind this to removeZeros so we can access state.
       removeZeros = removeZeros.bind(this);
       removeZeros(row, col);
+      //update cell cleared count
       this.setState({
           cellsCleared: this.state.cellsCleared + count
         });
     } else {
       e.target.innerHTML = '[' + this.state.board[row][col] + ']';
-      if(this.state.cellsCleared + this.state.mines + 1 === this.state.rows * this.state.cols) {
-        alert('You Win!!! :-)');
-      }
       this.setState({
         cellsCleared: this.state.cellsCleared + 1
       });
@@ -88,6 +110,7 @@ class Board extends React.Component {
     }
   }
 
+  /* Listener for receiving props from App. We make our board here */
   componentWillReceiveProps(newProps) {
     this.setState({
       rows: 0,

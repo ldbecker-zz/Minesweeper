@@ -6,7 +6,9 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
+/* Route for making a new board */
 router.post('/newBoard', function(req, res, next) {
+  //create an empty board of all 0s
   var board = [];
   for(var i = 0; i < req.body.rows; i++) {
     var row = [];
@@ -27,7 +29,7 @@ router.post('/newBoard', function(req, res, next) {
     board[randRow][randCol] = 'M';
   }
 
-  //update tiles
+  //update tiles to reflect # of adjacent mines
   for(var i = 0; i < req.body.rows; i++) {
     for(var j = 0; j < req.body.cols; j++) {
       if(board[i][j] !== 'M') {
@@ -43,6 +45,7 @@ router.post('/newBoard', function(req, res, next) {
       }
     }
   }
+  //send result
   res.status(200).send({board: board});
 });
 
