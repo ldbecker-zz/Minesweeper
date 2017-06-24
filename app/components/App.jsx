@@ -46,6 +46,7 @@ class App extends React.Component {
   render() {
     return (
         <div>
+          Instructions: First, create a board below. To play: Click on tiles to reveal them, hold CTRL and click to place a flag.
           <Board rows={this.state.rows} cols={this.state.cols} numMines={this.state.numMines}/><br/>
           <form onSubmit={this.newGameSubmit}>
             # Rows: <input type="text" id="rows"></input><br/>
